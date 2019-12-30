@@ -161,16 +161,6 @@ if CLIENT then
 	net.Receive("loadout_open", function ()
 		openLoadoutMenu()
 	end);
-	net.Receive("loadout_select_all", function ()
-		local num = tonumber(net.ReadString())
-		if num == 1 then
-			chat.AddText(loadouts.color.hotpink, loadouts.loadouts, loadouts.color.white, loadouts.missing.primary)
-		elseif num == 2 then
-			chat.AddText(loadouts.color.hotpink, loadouts.loadouts, loadouts.color.white, loadouts.missing.seconday)
-		elseif num == 3 then
-			chat.AddText(loadouts.color.hotpink, loadouts.loadouts, loadouts.color.white, loadouts.missing.grenade)
-		end
-	end);
 	concommand.Add("loadout_open", function ()
 		openLoadoutMenu()
 	end);

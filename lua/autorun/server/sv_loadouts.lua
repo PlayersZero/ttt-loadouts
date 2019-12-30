@@ -3,18 +3,15 @@ if SERVER then
 	util.AddNetworkString("loadouts_getinfo");
 	util.AddNetworkString("loadout_cleared");
 	util.AddNetworkString("loadout_open");
-	util.AddNetworkString("loadout_select_all");
 	util.AddNetworkString("loadout_set");
 	util.AddNetworkString("loadout_given");
 	include("loadouts_config.lua")
-	//if !sql.TableExists("loadouts") then
-	//	sql.Query("CREATE TABLE loadouts(sid TEXT, primary TEXT, secondary TEXT, grenade TEXT)")
-	//end
-	local succ = sql.Query("CREATE TABLE loadouts(sid TEXT, primary TEXT, secondary TEXT, grenade TEXT)")
-	if not succ then
-	  print(sql.LastError())
-	else
-		print("TABLE CREATED SUCCESSFULLY")
+	if sql.TableExists("loadouts") then
+		sql.Query("DROP TABLE loadouts;")
+		print("TABLE DROPPED, SIR!")
+	end
+	if !sql.TableExists("loadouts") then
+		sql.Query("CREATE TABLE `loadouts` (sid varchar(255), wprimary TEXT, secondary TEXT, grenade TEXT);")
 	end
 
 	hook.Add("TTTBeginRound", "QueryWeapons", function ()
@@ -23,7 +20,7 @@ if SERVER then
 			//print(tostring(tbl[1]))
 			//print(tostring(tbl[2]))
 			//print(tostring(tbl[3]))
-			local p = sql.Query("SELECT primary FROM loadouts WHERE sid = '" .. v:SteamID() .. "'")
+			local p = sql.Query("SELECT wprimary FROM loadouts WHERE sid = '" .. v:SteamID() .. "'")
 			local s = sql.Query("SELECT secondary FROM loadouts WHERE sid = '" .. v:SteamID() .. "'")
 			local g = sql.Query("SELECT grenade FROM loadouts WHERE sid = '" .. v:SteamID() .. "'")
 			////print(sql.LastError())
@@ -53,28 +50,19 @@ if SERVER then
 		local secondary = sql.SQLStr(weaps[2])
 		local grenade = sql.SQLStr(weaps[3])
 		if !primary && !secondary && !grenade then
-			sql.Query("UPDATE loadouts SET primary = 'none', secondary = 'none', grenade = 'none' WHERE sid = '" .. ply:SteamID() .. "'")
+			sql.Query("UPDATE loadouts SET wprimary = 'none', secondary = 'none', grenade = 'none' WHERE sid = '" .. ply:SteamID() .. "'")
 			net.Start("loadout_cleared")
 			net.Send(ply)
 			return;
 		end
 		if primary == nil then
-			net.Start("loadout_select_all")
-				net.WriteString("1")
-			net.Send(ply)
-			return;
+			primary = "none"
 		elseif secondary == nil then
-			net.Start("loadout_select_all")
-				net.WriteString("2")
-			net.Send(ply)
-			return;
+			secondary = "none"
 		elseif grenade == nil then
-			net.Start("loadout_select_all")
-				net.WriteString("3")
-			net.Send(ply)
-			return;
+			grenade = "none"
 		end
-		sql.Query("UPDATE loadouts SET primary = '" .. primary .. "', SET secondary = '" .. secondary .. "', SET grenade = '" .. grenade .. "'' WHERE sid = '" .. ply:SteamID() .. "'")
+		sql.Query("UPDATE loadouts SET wprimary = '" .. primary .. "', SET secondary = '" .. secondary .. "', SET grenade = '" .. grenade .. "'' WHERE sid = '" .. ply:SteamID() .. "'")
 		if !loadouts.debug then
 			net.Start("loadout_set")
 				net.WriteString("New Loadout Set!")
@@ -97,7 +85,7 @@ if SERVER then
 	hook.Add("PlayerSay", "loadout_print", function (ply, txt, bTeam)
 		local txt = string.lower(txt)
 		if table.HasValue(loadouts.txtprintcmds, txt:lower()) then
-			local p = sql.Query("SELECT primary FROM loadouts WHERE sid = '" .. v:SteamID() .. "'")
+			local p = sql.Query("SELECT wprimary FROM loadouts WHERE sid = '" .. v:SteamID() .. "'")
 			local s = sql.Query("SELECT secondary FROM loadouts WHERE sid = '" .. v:SteamID() .. "'")
 			local g = sql.Query("SELECT grenade FROM loadouts WHERE sid = '" .. v:SteamID() .. "'")
 			local tbl = {p, s, g}
