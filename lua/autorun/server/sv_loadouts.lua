@@ -12,25 +12,29 @@ if SERVER then
 				local g = v:GetInfo("loadouts_grenade", "none")
 				-- The commandments of loadouts
 				if v:CanUseLoadouts() && !v:IsSpec() then
-					v:StripWeapons()
-					if p != "none" then
-						v:Give(p)
+					local v.fr = true
+					if p == "none" && s == "none" && g == "none" then v.fr = false end
+					if v.fr then
+						v:StripWeapons()
+						if p != "none" then
+							v:Give(p)
+						end
+						if s != "none" then
+							v:Give(s)
+						end
+						if g != "none" then
+							v:Give(g)
+						end
+						v:Give("weapon_zm_improvised")
+						v:Give("weapon_ttt_unarmed")
+						v:Give("weapon_zm_carry")
+						if v:IsDetective() then
+							v:Give("weapon_ttt_wtester")
+						end
+						net.Start("loadout_given")
+							net.WriteString(loadouts.loadoutreceived)
+						net.Send(v)
 					end
-					if s != "none" then
-						v:Give(s)
-					end
-					if g != "none" then
-						v:Give(g)
-					end
-					v:Give("weapon_zm_improvised")
-					v:Give("weapon_ttt_unarmed")
-					v:Give("weapon_zm_carry")
-					if v:IsDetective() then
-						v:Give("weapon_ttt_wtester")
-					end
-					net.Start("loadout_given")
-						net.WriteString(loadouts.loadoutreceived)
-					net.Send(v)
 				end
 			end
 		end);
