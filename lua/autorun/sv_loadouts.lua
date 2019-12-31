@@ -3,18 +3,18 @@ if SERVER then
 	util.AddNetworkString("loadouts_getinfo");
 	util.AddNetworkString("loadout_open");
 	util.AddNetworkString("loadout_given");
-	include("loadouts_config.lua")
+	include("sh_loadouts_config.lua")
 	hook.Add("TTTBeginRound", "QueryWeapons", function ()
-		timer.Simple(0, function ()
+		timer.Simple(1, function ()
 			for k, v in ipairs(player.GetHumans()) do
-				local p = v:GetInfo("loadouts_primary", "none")
-				local s = v:GetInfo("loadouts_secondary", "none")
-				local g = v:GetInfo("loadouts_grenade", "none")
 				-- The commandments of loadouts
 				if v:CanUseLoadouts() && !v:IsSpec() then
-					local v.fr = true
-					if p == "none" && s == "none" && g == "none" then v.fr = false end
-					if v.fr then
+					local p = v:GetInfo("loadouts_primary", "none")
+					local s = v:GetInfo("loadouts_secondary", "none")
+					local g = v:GetInfo("loadouts_grenade", "none")
+					local fr = true
+					if p == "none" && s == "none" && g == "none" then fr = false end
+					if fr then
 						v:StripWeapons()
 						if p != "none" then
 							v:Give(p)
@@ -34,6 +34,7 @@ if SERVER then
 						net.Start("loadout_given")
 							net.WriteString(loadouts.loadoutreceived)
 						net.Send(v)
+						ServerLog("[LOADOUTS]: " .. v:Nick() .. " was given a loadout!\n")
 					end
 				end
 			end
@@ -60,4 +61,5 @@ if SERVER then
 			end);
 		end
 	end);
+	ServerLog("[LOADOUTS]: LOADED!\n")
 end

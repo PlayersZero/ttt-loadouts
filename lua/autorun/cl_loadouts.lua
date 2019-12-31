@@ -2,7 +2,7 @@ if CLIENT then
 	local p = CreateConVar("loadouts_primary", "none", FCVAR_USERINFO);
 	local s = CreateConVar("loadouts_secondary", "none", FCVAR_USERINFO);
 	local g = CreateConVar("loadouts_grenade", "none", FCVAR_USERINFO);
-	include("loadouts_config.lua");
+	include("sh_loadouts_config.lua");
 	surface.CreateFont("WeaponCategory", {
 		font = "Arial",
 		size = 20,
